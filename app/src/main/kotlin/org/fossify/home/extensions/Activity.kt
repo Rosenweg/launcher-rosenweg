@@ -86,6 +86,14 @@ fun android.content.Context.rosenwegVersteckt(): Set<String> {
     return set
 }
 
+/** Rosenweg: Ist am geteilten Telefon jemand angemeldet? (Geraete-App, ohne Netz; im Zweifel ja) */
+fun android.content.Context.rosenwegAngemeldet(): Boolean = try {
+    contentResolver.call(Uri.parse("content://ch.rosenweg4303.telefon.anlage"), "angemeldet", packageName, null)
+        ?.takeIf { it.containsKey("angemeldet") }?.getBoolean("angemeldet") ?: true
+} catch (e: Exception) {
+    true
+}
+
 fun android.content.Context.istVerwaltetesRosenwegTelefon(): Boolean = try {
     (getSystemService(android.content.Context.DEVICE_POLICY_SERVICE) as android.app.admin.DevicePolicyManager)
         .isDeviceOwnerApp("ch.rosenweg4303.telefon")

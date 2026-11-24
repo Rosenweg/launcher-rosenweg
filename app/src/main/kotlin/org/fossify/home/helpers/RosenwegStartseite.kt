@@ -90,6 +90,8 @@ object RosenwegStartseite {
         if (p.getBoolean(GELADEN, false)) return false
         val b = rufen(c, "einstellungen_holen", null) ?: return false   // niemand angemeldet
         p.edit().putBoolean(GELADEN, true).apply()
+        // Launcher-Einstellungen der Person (eigener Schluessel auf der Anlage)
+        if (AnlageEinstellungen.jetztHolen(c)) p.edit().putBoolean(NEU_AUFBAUEN, true).apply()
         val werte = JSONObject(b.getString("werte") ?: "{}")
         val startseite = werte.optJSONObject("startseite")?.optString("v")?.takeIf { it.isNotEmpty() }
             ?: return false   // Person hat noch keine: Standard bleibt, wird beim Verlassen gespeichert
@@ -166,6 +168,7 @@ object RosenwegStartseite {
     /** Abmelden: zurueck auf den Standard (Standard-Symbole, Uhr, Kamera). */
     fun zuruecksetzen(c: Context) {
         alleEntfernen(c)
+        AnlageEinstellungen.zuruecksetzen(c)
         prefs(c).edit().remove(GELADEN).remove(SIGNATUR).remove(AUSSTEHEND).putBoolean("standard_v1", false)
             .putBoolean(NEU_AUFBAUEN, true).apply()
         c.config.wasHomeScreenInit = false

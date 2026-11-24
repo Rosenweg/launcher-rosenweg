@@ -1,6 +1,8 @@
 package org.fossify.home.activities
 
 import org.fossify.home.extensions.rosenwegVersteckt
+import org.fossify.home.extensions.istVerwaltetesRosenwegTelefon
+import org.fossify.home.extensions.rosenwegAngemeldet
 
 import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
@@ -252,6 +254,15 @@ class MainActivity : SimpleActivity(), FlingListener {
 
     override fun onResume() {
         super.onResume()
+        // Rosenweg: Niemand angemeldet (z.B. kurz nach einem Update der Geraete-App, bevor deren
+        // Sperrbildschirm wieder steht)? Dann gleich zurueck zum Sperrbildschirm.
+        if (istVerwaltetesRosenwegTelefon() && !rosenwegAngemeldet()) {
+            try {
+                startActivity(Intent().setClassName("ch.rosenweg4303.telefon", "org.sipdroid.sipua.rosenweg.SperrHome")
+                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+            } catch (_: Exception) {
+            }
+        }
         wasJustPaused = false
         refreshWallpaperSupportsDarkText()
         Handler(Looper.getMainLooper()).postDelayed({
