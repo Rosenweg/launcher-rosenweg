@@ -32,6 +32,15 @@ object RosenwegStartseite {
     private const val GELADEN = "startseite_geladen"
     private const val SIGNATUR = "startseite_signatur"
     const val AUSSTEHEND = "ausstehende_widgets"
+    private const val NEU_AUFBAUEN = "neu_aufbauen"
+
+    /** Startseite wurde ersetzt/zurueckgesetzt: Ansicht beim naechsten Anzeigen ganz neu aufbauen. */
+    fun neuAufbauenNoetig(c: Context): Boolean {
+        val p = prefs(c)
+        if (!p.getBoolean(NEU_AUFBAUEN, false)) return false
+        p.edit().putBoolean(NEU_AUFBAUEN, false).apply()
+        return true
+    }
 
     private fun prefs(c: Context) = c.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
 
@@ -142,7 +151,8 @@ object RosenwegStartseite {
             val id = db.insert(element(e, parent))
             neueIds[e.getLong("k")] = id
         }
-        prefs(c).edit().putString(AUSSTEHEND, widgets.toString()).putBoolean("standard_v1", true).apply()
+        prefs(c).edit().putString(AUSSTEHEND, widgets.toString()).putBoolean("standard_v1", true)
+            .putBoolean(NEU_AUFBAUEN, true).apply()
         c.config.wasHomeScreenInit = true
     }
 
@@ -156,7 +166,8 @@ object RosenwegStartseite {
     /** Abmelden: zurueck auf den Standard (Standard-Symbole, Uhr, Kamera). */
     fun zuruecksetzen(c: Context) {
         alleEntfernen(c)
-        prefs(c).edit().remove(GELADEN).remove(SIGNATUR).remove(AUSSTEHEND).putBoolean("standard_v1", false).apply()
+        prefs(c).edit().remove(GELADEN).remove(SIGNATUR).remove(AUSSTEHEND).putBoolean("standard_v1", false)
+            .putBoolean(NEU_AUFBAUEN, true).apply()
         c.config.wasHomeScreenInit = false
         Log.i(TAG, "Startseite auf Standard zurueckgesetzt")
     }

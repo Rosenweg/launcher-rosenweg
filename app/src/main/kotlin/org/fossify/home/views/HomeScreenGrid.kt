@@ -242,7 +242,15 @@ class HomeScreenGrid(context: Context, attrs: AttributeSet, defStyle: Int) :
             val providers = appWidgetManager.installedProviders
             val rosenwegWidgets = rosenwegAusstehend(providers) + listOfNotNull(rosenwegStandard(providers))
             val versteckt = context.rosenwegVersteckt()   // Rosenweg: System-Telefon-Apps ausblenden
-            gridItems = ArrayList(context.homeScreenGridItemsDB.getAllItems().filter { it.packageName !in versteckt })
+            val alleItems = context.homeScreenGridItemsDB.getAllItems()
+            // Rosenweg: Widgets abmelden, die nicht mehr auf der Startseite stehen (sonst bleiben
+            // sie bei Android registriert, z.B. nach Zuruecksetzen beim Abmelden)
+            try {
+                val bekannt = alleItems.filter { it.type == ITEM_TYPE_WIDGET }.map { it.widgetId }.toSet()
+                appWidgetHost.appWidgetIds.filter { it !in bekannt }.forEach { appWidgetHost.deleteAppWidgetId(it) }
+            } catch (_: Exception) {
+            }
+            gridItems = ArrayList(alleItems.filter { it.packageName !in versteckt })
             gridItems.toImmutableList().forEach { item ->
                 if (item.type == ITEM_TYPE_ICON) {
                     item.drawable = context.getDrawableForPackageName(item.packageName)

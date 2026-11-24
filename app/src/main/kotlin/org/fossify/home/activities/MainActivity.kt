@@ -289,8 +289,11 @@ class MainActivity : SimpleActivity(), FlingListener {
 
             binding.allAppsFragment.root.gotLaunchers(IconCache.launchers)
             // Rosenweg: nach der Anmeldung die Startseite der Person (Anlage)
-            if (RosenwegStartseite.ladenWennNoetig(this)) {
-                runOnUiThread { binding.homeScreenGrid.root.rosenwegNeuAufbauen() }
+            RosenwegStartseite.ladenWennNoetig(this)
+            if (RosenwegStartseite.neuAufbauenNoetig(this)) {
+                // Ansicht ganz neu: alte Widget-Ansichten sonst noch auf dem Bildschirm
+                runOnUiThread { recreate() }
+                return@ensureBackgroundThread
             }
             refreshLaunchers()
         }
