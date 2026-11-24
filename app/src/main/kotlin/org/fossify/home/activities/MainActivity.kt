@@ -1,5 +1,7 @@
 package org.fossify.home.activities
 
+import org.fossify.home.extensions.rosenwegVersteckt
+
 import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
 import android.app.WallpaperManager
@@ -554,7 +556,8 @@ class MainActivity : SimpleActivity(), FlingListener {
     }
 
     private fun findFirstEmptyCell(): Pair<Int, Rect> {
-        val gridItems = homeScreenGridItemsDB.getAllItems() as ArrayList<HomeScreenGridItem>
+        // Rosenweg: System-Telefon-Apps nicht auf dem Startbildschirm
+        val gridItems = ArrayList(homeScreenGridItemsDB.getAllItems().filter { it.packageName !in rosenwegVersteckt() })
         val maxPage = gridItems.maxOf { it.page }
         val occupiedCells = ArrayList<Triple<Int, Int, Int>>()
         gridItems.toImmutableList().filter { it.parentId == null }.forEach { item ->
@@ -1084,6 +1087,7 @@ class MainActivity : SimpleActivity(), FlingListener {
             it.getIconIdentifier()
         }
 
+        val versteckteTelefonApps = rosenwegVersteckt()
         val allApps = ArrayList<AppLauncher>()
         val intent = Intent(Intent.ACTION_MAIN, null)
         intent.addCategory(Intent.CATEGORY_LAUNCHER)
@@ -1099,7 +1103,7 @@ class MainActivity : SimpleActivity(), FlingListener {
             }
 
             val activityName = info.activityInfo.name
-            if (hiddenIcons.contains("$packageName/$activityName")) {
+            if (hiddenIcons.contains("$packageName/$activityName") || packageName in versteckteTelefonApps) {
                 continue
             }
 
@@ -1219,9 +1223,9 @@ class MainActivity : SimpleActivity(), FlingListener {
         }
 
         try {
-            val potentialStores = arrayListOf(
-                "com.android.vending", "org.fdroid.fdroid", "com.aurora.store"
-            )
+            // Rosenweg: kein Store-Symbol auf dem Startbildschirm (Apps kommen
+            // auf geteilten Telefonen aus dem Katalog der Anlage).
+            val potentialStores = arrayListOf<String>()
             val storePackage = potentialStores.firstOrNull {
                 isPackageInstalled(it) && appLaunchers.map { it.packageName }.contains(it)
             }

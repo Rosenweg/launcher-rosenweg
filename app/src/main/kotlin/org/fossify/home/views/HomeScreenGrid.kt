@@ -1,5 +1,7 @@
 package org.fossify.home.views
 
+import org.fossify.home.extensions.rosenwegVersteckt
+
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.animation.ValueAnimator
@@ -236,7 +238,8 @@ class HomeScreenGrid(context: Context, attrs: AttributeSet, defStyle: Int) :
     fun fetchGridItems() {
         ensureBackgroundThread {
             val providers = appWidgetManager.installedProviders
-            gridItems = context.homeScreenGridItemsDB.getAllItems() as ArrayList<HomeScreenGridItem>
+            val versteckt = context.rosenwegVersteckt()   // Rosenweg: System-Telefon-Apps ausblenden
+            gridItems = ArrayList(context.homeScreenGridItemsDB.getAllItems().filter { it.packageName !in versteckt })
             gridItems.toImmutableList().forEach { item ->
                 if (item.type == ITEM_TYPE_ICON) {
                     item.drawable = context.getDrawableForPackageName(item.packageName)
