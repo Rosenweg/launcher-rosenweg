@@ -88,6 +88,7 @@ import org.fossify.home.helpers.ITEM_TYPE_ICON
 import org.fossify.home.helpers.ITEM_TYPE_SHORTCUT
 import org.fossify.home.helpers.ITEM_TYPE_WIDGET
 import org.fossify.home.helpers.IconCache
+import org.fossify.home.helpers.RosenwegStartseite
 import org.fossify.home.helpers.REQUEST_ALLOW_BINDING_WIDGET
 import org.fossify.home.helpers.REQUEST_CONFIGURE_WIDGET
 import org.fossify.home.helpers.REQUEST_CREATE_SHORTCUT
@@ -287,6 +288,10 @@ class MainActivity : SimpleActivity(), FlingListener {
             }
 
             binding.allAppsFragment.root.gotLaunchers(IconCache.launchers)
+            // Rosenweg: nach der Anmeldung die Startseite der Person (Anlage)
+            if (RosenwegStartseite.ladenWennNoetig(this)) {
+                runOnUiThread { binding.homeScreenGrid.root.rosenwegNeuAufbauen() }
+            }
             refreshLaunchers()
         }
 
@@ -319,6 +324,8 @@ class MainActivity : SimpleActivity(), FlingListener {
     override fun onPause() {
         super.onPause()
         wasJustPaused = true
+        // Rosenweg: geaenderte Startseite der Person speichern
+        ensureBackgroundThread { RosenwegStartseite.senden(applicationContext) }
     }
 
     override fun onBackPressedCompat(): Boolean {

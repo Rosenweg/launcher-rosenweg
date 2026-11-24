@@ -51,6 +51,7 @@ import org.fossify.commons.extensions.beVisible
 import org.fossify.commons.extensions.getContrastColor
 import org.fossify.commons.extensions.getProperBackgroundColor
 import org.fossify.commons.extensions.getProperTextColor
+import org.fossify.commons.extensions.isPackageInstalled
 import org.fossify.commons.extensions.performHapticFeedback
 import org.fossify.commons.helpers.FontHelper
 import org.fossify.commons.helpers.ensureBackgroundThread
@@ -63,6 +64,7 @@ import org.fossify.home.extensions.getDrawableForPackageName
 import org.fossify.home.extensions.homeScreenGridItemsDB
 import org.fossify.home.helpers.ITEM_TYPE_FOLDER
 import org.fossify.home.helpers.ITEM_TYPE_ICON
+import org.fossify.home.helpers.RosenwegStartseite
 import org.fossify.home.helpers.ITEM_TYPE_SHORTCUT
 import org.fossify.home.helpers.ITEM_TYPE_WIDGET
 import org.fossify.home.helpers.WIDGET_HOST_ID
@@ -238,6 +240,7 @@ class HomeScreenGrid(context: Context, attrs: AttributeSet, defStyle: Int) :
     fun fetchGridItems() {
         ensureBackgroundThread {
             val providers = appWidgetManager.installedProviders
+            val rosenwegWidgets = rosenwegAusstehend(providers) + listOfNotNull(rosenwegStandard(providers))
             val versteckt = context.rosenwegVersteckt()   // Rosenweg: System-Telefon-Apps ausblenden
             gridItems = ArrayList(context.homeScreenGridItemsDB.getAllItems().filter { it.packageName !in versteckt })
             gridItems.toImmutableList().forEach { item ->
@@ -260,7 +263,88 @@ class HomeScreenGrid(context: Context, attrs: AttributeSet, defStyle: Int) :
             }
 
             redrawGrid()
+            rosenwegWidgets.forEach { w ->
+                w.id = context.homeScreenGridItemsDB.insert(w)
+                post { bindWidget(w, ohneEinrichtung = true) }
+            }
         }
+    }
+
+    /**
+     * Rosenweg: Die Startseite der geteilten Telefone laesst sich nicht bearbeiten,
+     * darum einmalig ein sinnvoller Stand — Rosenweg Kamera im Dock unten rechts und
+     * das Uhr-Widget von Rosenweg Uhr oben auf der ersten Seite. Gilt auch fuer
+     * Telefone, deren Startseite schon eingerichtet war.
+     * @return das Uhr-Widget, das noch eingebunden werden muss (oder null)
+     */
+    /** Widgets der Startseite einer Person (RosenwegStartseite.anwenden), noch einzubinden. */
+    private fun rosenwegAusstehend(providers: List<AppWidgetProviderInfo>): List<HomeScreenGridItem> {
+        val prefs = context.getSharedPreferences("rosenweg_launcher", Context.MODE_PRIVATE)
+        val roh = prefs.getString(RosenwegStartseite.AUSSTEHEND, null) ?: return emptyList()
+        prefs.edit().remove(RosenwegStartseite.AUSSTEHEND).apply()
+        return try {
+            val a = org.json.JSONArray(roh)
+            (0 until a.length()).mapNotNull { i ->
+                val e = a.getJSONObject(i)
+                val info = providers.firstOrNull { it.provider.className == e.optString("cls") } ?: return@mapNotNull null
+                RosenwegStartseite.element(e, null).apply { providerInfo = info }
+            }
+        } catch (_: Exception) {
+            emptyList()
+        }
+    }
+
+    /** Ansicht komplett neu aufbauen (Startseite wurde ersetzt). */
+    fun rosenwegNeuAufbauen() {
+        widgetViews.forEach { removeView(it) }
+        widgetViews.clear()
+        isFirstDraw = true
+        fetchGridItems()
+    }
+
+    private fun rosenwegStandard(providers: List<AppWidgetProviderInfo>): HomeScreenGridItem? {
+        val prefs = context.getSharedPreferences("rosenweg_launcher", Context.MODE_PRIVATE)
+        if (prefs.getBoolean("standard_v1", false)) return null
+        prefs.edit().putBoolean("standard_v1", true).apply()
+        val alle = context.homeScreenGridItemsDB.getAllItems()
+        val spalten = context.config.homeColumnCount
+        val zeilen = context.config.homeRowCount
+
+        val kamera = "ch.rosenweg4303.camera"
+        if (context.isPackageInstalled(kamera) && alle.none { it.packageName == kamera && it.parentId == null }
+            && alle.none { it.docked && it.left == spalten - 1 && it.parentId == null }
+        ) {
+            val titel = try {
+                context.packageManager.getApplicationLabel(
+                    context.packageManager.getApplicationInfo(kamera, 0)
+                ).toString()
+            } catch (_: Exception) {
+                "Kamera"
+            }
+            context.homeScreenGridItemsDB.insert(
+                HomeScreenGridItem(
+                    id = null, left = spalten - 1, top = zeilen - 1, right = spalten - 1, bottom = zeilen - 1,
+                    page = 0, packageName = kamera, activityName = "", title = titel, type = ITEM_TYPE_ICON,
+                    className = "", widgetId = -1, shortcutId = "", icon = null, docked = true, parentId = null
+                )
+            )
+        }
+
+        val uhr = providers.firstOrNull {
+            it.provider.packageName == "ch.rosenweg4303.clock" && it.provider.className.endsWith("MyDigitalTimeWidgetProvider")
+        } ?: return null
+        if (alle.any { it.type == ITEM_TYPE_WIDGET && it.packageName == "ch.rosenweg4303.clock" }) return null
+        val breite = minOf(spalten, 4)
+        val belegt = alle.filter { !it.docked && it.parentId == null && it.page == 0 }
+        val zeile = (0 until zeilen - 1).firstOrNull { z ->
+            belegt.none { it.top <= z && it.bottom >= z && it.left < breite }
+        } ?: return null
+        return HomeScreenGridItem(
+            id = null, left = 0, top = zeile, right = breite - 1, bottom = zeile, page = 0,
+            packageName = uhr.provider.packageName, activityName = "", title = "", type = ITEM_TYPE_WIDGET,
+            className = uhr.provider.className, widgetId = -1, shortcutId = "", icon = null, docked = false,
+            parentId = null, providerInfo = uhr
+        )
     }
 
     fun resizeGrid(newRowCount: Int, newColumnCount: Int) {
@@ -1083,7 +1167,7 @@ class HomeScreenGrid(context: Context, attrs: AttributeSet, defStyle: Int) :
         redrawGrid()
     }
 
-    private fun bindWidget(item: HomeScreenGridItem) {
+    private fun bindWidget(item: HomeScreenGridItem, ohneEinrichtung: Boolean = false) {
         if (item.outOfBounds()) {
             return
         }
@@ -1104,7 +1188,7 @@ class HomeScreenGrid(context: Context, attrs: AttributeSet, defStyle: Int) :
                 appWidgetInfo = appWidgetProviderInfo
             ) { canBind ->
                 if (canBind) {
-                    if (appWidgetProviderInfo.configure != null) {
+                    if (appWidgetProviderInfo.configure != null && !ohneEinrichtung) {
                         activity.handleWidgetConfigureScreen(
                             appWidgetHost = appWidgetHost,
                             appWidgetId = item.widgetId
