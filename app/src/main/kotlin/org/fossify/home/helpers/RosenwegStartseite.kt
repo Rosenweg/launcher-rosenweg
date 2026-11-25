@@ -33,6 +33,11 @@ object RosenwegStartseite {
     private const val SIGNATUR = "startseite_signatur"
     const val AUSSTEHEND = "ausstehende_widgets"
     private const val NEU_AUFBAUEN = "neu_aufbauen"
+    /** Elemente der zuletzt geladenen/gespeicherten Startseite der Person (Schutzregel in senden). */
+    private const val GESPEICHERT = "startseite_gespeichert_anzahl"
+    private const val RUECKMELDUNG = "ch.rosenweg4303.telefon.STARTSEITE_GELADEN"
+    private const val GERAET = "ch.rosenweg4303.telefon"
+    private const val BERECHTIGUNG = "ch.rosenweg4303.permission.ANLAGE"
 
     /** Startseite wurde ersetzt/zurueckgesetzt: Ansicht beim naechsten Anzeigen ganz neu aufbauen. */
     fun neuAufbauenNoetig(c: Context): Boolean {
@@ -81,29 +86,84 @@ object RosenwegStartseite {
         return k.toString().hashCode().toString()
     }
 
+    /** Ergebnis des Ladens: ersetzt = Startseite der Person uebernommen, standard = Person hat keine. */
+    class Laden(val ersetzt: Boolean, val standard: Boolean, val fehler: String?)
+
     /**
      * Nach der Anmeldung einmal pro Sitzung: Startseite der Person holen.
      * @return true, wenn die Startseite ersetzt wurde (Ansicht neu aufbauen)
      */
-    fun ladenWennNoetig(c: Context): Boolean {
+    fun ladenWennNoetig(c: Context): Boolean = laden(c).ersetzt
+
+    @Synchronized
+    private fun laden(c: Context): Laden {
         val p = prefs(c)
-        if (p.getBoolean(GELADEN, false)) return false
-        val b = rufen(c, "einstellungen_holen", null) ?: return false   // niemand angemeldet
+        if (p.getBoolean(GELADEN, false)) return Laden(false, false, null)
+        val b = rufen(c, "einstellungen_holen", null)
+            ?: return Laden(false, false, "keine Antwort der Geräte-App")   // niemand angemeldet
         p.edit().putBoolean(GELADEN, true).apply()
         // Launcher-Einstellungen der Person (eigener Schluessel auf der Anlage)
         if (AnlageEinstellungen.jetztHolen(c)) p.edit().putBoolean(NEU_AUFBAUEN, true).apply()
         val werte = JSONObject(b.getString("werte") ?: "{}")
         val startseite = werte.optJSONObject("startseite")?.optString("v")?.takeIf { it.isNotEmpty() }
-            ?: return false   // Person hat noch keine: Standard bleibt, wird beim Verlassen gespeichert
+        if (startseite == null) {
+            // Person hat noch keine: Standard bleibt, wird beim Verlassen gespeichert
+            p.edit().putInt(GESPEICHERT, 0).apply()
+            return Laden(false, true, null)
+        }
         return try {
-            anwenden(c, JSONObject(startseite))
+            val j = JSONObject(startseite)
+            p.edit().putInt(GESPEICHERT, j.optJSONArray("elemente")?.length() ?: 0).apply()
+            anwenden(c, j)
             p.edit().putString(SIGNATUR, signatur(exportieren(c))).apply()
             Log.i(TAG, "Startseite der Person uebernommen")
-            true
+            Laden(true, false, null)
         } catch (e: Exception) {
             Log.w(TAG, "anwenden: $e")
-            false
+            Laden(false, false, "Startseite der Person nicht lesbar")
         }
+    }
+
+    /** Elemente der Startseite: in der Datenbank plus noch einzubindende Widgets. */
+    private fun anzahl(c: Context): Int {
+        val ausstehend = try {
+            JSONArray(prefs(c).getString(AUSSTEHEND, null) ?: "[]").length()
+        } catch (_: Exception) {
+            0
+        }
+        return c.homeScreenGridItemsDB.getAllItems().size + ausstehend
+    }
+
+    /**
+     * Rueckmeldung an die Geraete-App (Einrichtungsbildschirm, ab Geraet v234): Startseite geladen
+     * bzw. zurueckgesetzt. Nur an Geraet und nur mit der Signatur-Berechtigung ANLAGE.
+     */
+    private fun melden(c: Context, was: String, symbole: Int, standard: Boolean, fehler: String?) {
+        try {
+            c.sendBroadcast(Intent(RUECKMELDUNG).setPackage(GERAET)
+                .putExtra("was", was).putExtra("symbole", symbole).putExtra("standard", standard)
+                .apply { if (fehler != null) putExtra("fehler", fehler) }, BERECHTIGUNG)
+            Log.i(TAG, "Rueckmeldung $was: $symbole Symbole" + (if (standard) ", Standard" else ""))
+        } catch (e: Exception) {
+            Log.w(TAG, "Rueckmeldung $was: $e")
+        }
+    }
+
+    /**
+     * Elemente der Startseite, die auf der Anlage gespeichert ist; -1 = unbekannt.
+     * Zuerst die Anlage fragen, sonst die beim Laden/Speichern gemerkte Anzahl.
+     */
+    private fun gespeicherteAnzahl(c: Context): Int {
+        val b = rufen(c, "einstellungen_holen", null)
+        if (b != null) {
+            return try {
+                val v = JSONObject(b.getString("werte") ?: "{}").optJSONObject("startseite")?.optString("v")
+                if (v.isNullOrEmpty()) 0 else JSONObject(v).optJSONArray("elemente")?.length() ?: 0
+            } catch (_: Exception) {
+                prefs(c).getInt(GESPEICHERT, -1)
+            }
+        }
+        return prefs(c).getInt(GESPEICHERT, -1)
     }
 
     /** Beim Verlassen der Startseite: hochladen, wenn geaendert (nur nach dem Laden). */
@@ -113,13 +173,23 @@ object RosenwegStartseite {
         val j = exportieren(c)
         val sig = signatur(j)
         if (sig == p.getString(SIGNATUR, null)) return
+        // Schutzregel (Stefan 25.11.2026): eine fast leere Startseite (z.B. nur Telefon, weil die Apps
+        // beim Anzeigen noch versteckt waren) nie ueber eine gespeicherte mit mehr Elementen schreiben
+        val anzahl = j.getJSONArray("elemente").length()
+        if (anzahl <= 1) {
+            val gespeichert = gespeicherteAnzahl(c)
+            if (gespeichert > anzahl) {
+                Log.w(TAG, "Startseite mit $anzahl Element(en) nicht gespeichert, auf der Anlage liegen $gespeichert")
+                return
+            }
+        }
         val werte = JSONObject().put("startseite", JSONObject().put("t", "s").put("v", j.toString()))
         val b = rufen(c, "einstellungen_senden", Bundle().apply {
             putLong("geaendert", System.currentTimeMillis())
             putString("werte", werte.toString())
         })
         if (b != null) {
-            p.edit().putString(SIGNATUR, sig).apply()
+            p.edit().putString(SIGNATUR, sig).putInt(GESPEICHERT, anzahl).apply()
             Log.i(TAG, "Startseite gespeichert")
         }
     }
@@ -169,7 +239,7 @@ object RosenwegStartseite {
     fun zuruecksetzen(c: Context) {
         alleEntfernen(c)
         AnlageEinstellungen.zuruecksetzen(c)
-        prefs(c).edit().remove(GELADEN).remove(SIGNATUR).remove(AUSSTEHEND).putBoolean("standard_v1", false)
+        prefs(c).edit().remove(GELADEN).remove(SIGNATUR).remove(AUSSTEHEND).remove(GESPEICHERT).putBoolean("standard_v1", false)
             .putBoolean(NEU_AUFBAUEN, true).apply()
         c.config.wasHomeScreenInit = false
         Log.i(TAG, "Startseite auf Standard zurueckgesetzt")
@@ -183,8 +253,23 @@ object RosenwegStartseite {
             Thread {
                 try {
                     when (i.getStringExtra("was")) {
-                        "abmelden" -> zuruecksetzen(c)
-                        "anmelden" -> prefs(c).edit().remove(GELADEN).apply()
+                        "abmelden" -> {
+                            zuruecksetzen(c)
+                            // Standard baut der Launcher beim naechsten Anzeigen auf
+                            melden(c, "abmelden", anzahl(c), true, null)
+                        }
+                        "anmelden" -> {
+                            // Gleich hier laden (nicht erst beim Anzeigen), damit der Einrichtungsbildschirm
+                            // der Geraete-App vor dem Startbildschirm weiss, ob die Startseite steht.
+                            prefs(c).edit().remove(GELADEN).apply()
+                            val r = try {
+                                laden(c)
+                            } catch (e: Exception) {
+                                Log.w(TAG, "laden: $e")
+                                Laden(false, false, "Startseite nicht geladen")
+                            }
+                            melden(c, "anmelden", anzahl(c), r.standard, r.fehler)
+                        }
                     }
                 } finally {
                     fertig.finish()
