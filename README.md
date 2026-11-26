@@ -7,6 +7,7 @@
 
 - [Überblick](#überblick)
 - [Plattformen](#plattformen)
+- [Anmeldung](#anmeldung)
 - [Rechte und Gruppen](#rechte-und-gruppen)
 - [Bedienung](#bedienung)
 - [Geteilte Rosenweg-Telefone](#geteilte-rosenweg-telefone)
@@ -41,6 +42,10 @@ Was die App kann:
 
 Nicht im Play Store und nicht auf F-Droid.
 
+## Anmeldung
+
+Der Launcher ist offen und hat keinen Anmeldeschirm. Auf geteilten Telefonen gilt die Anmeldung von Rosenweg Gerät: ist niemand angemeldet, springt er zurück zum Sperrbildschirm.
+
 ## Rechte und Gruppen
 
 Die App hat keine eigenen Rollen. Wer sie auf den geteilten Telefonen bekommt, legt der App-Katalog der Telefonanlage fest.
@@ -49,7 +54,7 @@ Die App hat keine eigenen Rollen. Wer sie auf den geteilten Telefonen bekommt, l
 |---|---|
 | Technik | legt die App im Katalog auf /smartphones an, wählt die Gruppen, schaltet sie aktiv; kann Apps auf den geteilten Telefonen ausblenden |
 | Angemeldete Person in einer der Gruppen des Katalog-Eintrags (leer = alle) | sieht die App auf dem geteilten Telefon; Einstellungen und Startseite gehören ihr |
-| Alle anderen | auf dem eigenen Handy: APK von /apps, ohne Anmeldung |
+| Alle | auf dem eigenen Handy: APK von /apps |
 
 ## Bedienung
 
@@ -73,7 +78,7 @@ Auf den geteilten Telefonen (mit Rosenweg Gerät, Anmeldung per Karte am Sperrbi
 | Niemand angemeldet | der Launcher springt zurück zum Sperrbildschirm von Rosenweg Gerät |
 | Apps ausblenden | Rosenweg Gerät kann weitere Apps ausblenden (Managed Configuration, Schlüssel `unsichtbar`; gepflegt auf /smartphones) |
 | Updates | Rosenweg Gerät installiert die App aus dem App-Katalog und hält sie aktuell. |
-| Ohne Rosenweg Gerät | alles bleibt wie gewohnt auf dem Handy. |
+| Ohne Rosenweg Gerät | die Einstellungen bleiben auf dem Handy. |
 
 Voraussetzung: die Rosenweg-Signatur. Rosenweg Gerät beantwortet Anfragen nur von Apps mit seiner Signatur (`ch.rosenweg4303.permission.ANLAGE`).
 
