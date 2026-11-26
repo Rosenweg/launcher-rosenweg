@@ -14,7 +14,12 @@ class MyAppWidgetHostView(context: Context) : AppWidgetHostView(context) {
     private var actionDownCoords = PointF()
     private var currentCoords = PointF()
     private var actionDownMS = 0L
-    private val moveGestureThreshold = resources.getDimension(R.dimen.move_gesture_threshold).toInt() / 4
+    // Rosenweg: volle Schwelle (20 dp) statt einem Viertel — mit 5 dp brach ein echter Finger
+    // den langen Druck auf Widgets fast immer ab (A15, 24.11.2026; per adb ging es).
+    private val moveGestureThreshold = maxOf(
+        resources.getDimension(R.dimen.move_gesture_threshold).toInt(),
+        ViewConfiguration.get(context).scaledTouchSlop * 2
+    )
     var hasLongPressed = false
     var ignoreTouches = false
     var longPressListener: ((x: Float, y: Float) -> Unit)? = null

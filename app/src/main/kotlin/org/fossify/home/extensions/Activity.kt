@@ -56,6 +56,51 @@ fun Activity.launchApp(packageName: String, activityName: String) {
     }
 }
 
+/**
+ * Rosenweg: Ist das Geraet ein geteiltes, verwaltetes Rosenweg-Telefon
+ * (Rosenweg Telefon ist Device Owner)? Dann kein "App-Info" und kein
+ * "Deinstallieren" — beides fuehrt in die Einstellungen bzw. am Katalog vorbei.
+ * Auf privaten Handys bleibt alles wie im Original.
+ */
+/**
+ * Rosenweg: System-Telefon-Apps nicht anzeigen, sobald Rosenweg Phone installiert
+ * ist. Sie bleiben installiert — Android nimmt fuer Notrufe zwingend die
+ * System-Telefon-App (Telecom InCallController, EmergencyInCallServiceConnection).
+ */
+fun android.content.Context.rosenwegVersteckt(): Set<String> {
+    val telefonDa = try {
+        packageManager.getPackageInfo("ch.rosenweg4303.phone", 0); true
+    } catch (e: Exception) {
+        false
+    }
+    val set = HashSet<String>()
+    if (telefonDa) set += listOf("com.samsung.android.dialer", "com.google.android.dialer", "com.android.dialer")
+    // Liste "nur unsichtbar" von der Rosenweg-Geraete-App (Managed Configuration,
+    // Schluessel "unsichtbar", Pakete durch Komma getrennt). Auf privaten Handys leer.
+    try {
+        val rm = getSystemService(android.content.Context.RESTRICTIONS_SERVICE) as android.content.RestrictionsManager
+        rm.applicationRestrictions.getString("unsichtbar")?.split(',')?.map { it.trim() }?.filter { it.isNotEmpty() }
+            ?.let { set += it }
+    } catch (e: Exception) {
+    }
+    return set
+}
+
+/** Rosenweg: Ist am geteilten Telefon jemand angemeldet? (Geraete-App, ohne Netz; im Zweifel ja) */
+fun android.content.Context.rosenwegAngemeldet(): Boolean = try {
+    contentResolver.call(Uri.parse("content://ch.rosenweg4303.telefon.anlage"), "angemeldet", packageName, null)
+        ?.takeIf { it.containsKey("angemeldet") }?.getBoolean("angemeldet") ?: true
+} catch (e: Exception) {
+    true
+}
+
+fun android.content.Context.istVerwaltetesRosenwegTelefon(): Boolean = try {
+    (getSystemService(android.content.Context.DEVICE_POLICY_SERVICE) as android.app.admin.DevicePolicyManager)
+        .isDeviceOwnerApp("ch.rosenweg4303.telefon")
+} catch (e: Exception) {
+    false
+}
+
 fun Activity.launchAppInfo(packageName: String) {
     Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
         data = Uri.fromParts("package", packageName, null)
@@ -106,9 +151,10 @@ fun Activity.handleGridItemPopupMenu(
         menu.findItem(R.id.hide_icon).isVisible =
             gridItem.type == ITEM_TYPE_ICON && isOnAllAppsFragment
         menu.findItem(R.id.resize).isVisible = gridItem.type == ITEM_TYPE_WIDGET
-        menu.findItem(R.id.app_info).isVisible = gridItem.type == ITEM_TYPE_ICON
+        val verwaltet = istVerwaltetesRosenwegTelefon()
+        menu.findItem(R.id.app_info).isVisible = gridItem.type == ITEM_TYPE_ICON && !verwaltet
         menu.findItem(R.id.uninstall).isVisible = gridItem.type == ITEM_TYPE_ICON
-                && canAppBeUninstalled(gridItem.packageName)
+                && canAppBeUninstalled(gridItem.packageName) && !verwaltet
                 && gridItem.packageName != packageName
         menu.findItem(R.id.remove).isVisible = !isOnAllAppsFragment
 

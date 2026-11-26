@@ -1,5 +1,9 @@
 package org.fossify.home.activities
 
+import org.fossify.home.extensions.rosenwegVersteckt
+import org.fossify.home.extensions.istVerwaltetesRosenwegTelefon
+import org.fossify.home.extensions.rosenwegAngemeldet
+
 import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
 import android.app.WallpaperManager
@@ -86,6 +90,7 @@ import org.fossify.home.helpers.ITEM_TYPE_ICON
 import org.fossify.home.helpers.ITEM_TYPE_SHORTCUT
 import org.fossify.home.helpers.ITEM_TYPE_WIDGET
 import org.fossify.home.helpers.IconCache
+import org.fossify.home.helpers.RosenwegStartseite
 import org.fossify.home.helpers.REQUEST_ALLOW_BINDING_WIDGET
 import org.fossify.home.helpers.REQUEST_CONFIGURE_WIDGET
 import org.fossify.home.helpers.REQUEST_CREATE_SHORTCUT
@@ -249,6 +254,15 @@ class MainActivity : SimpleActivity(), FlingListener {
 
     override fun onResume() {
         super.onResume()
+        // Rosenweg: Niemand angemeldet (z.B. kurz nach einem Update der Geraete-App, bevor deren
+        // Sperrbildschirm wieder steht)? Dann gleich zurueck zum Sperrbildschirm.
+        if (istVerwaltetesRosenwegTelefon() && !rosenwegAngemeldet()) {
+            try {
+                startActivity(Intent().setClassName("ch.rosenweg4303.telefon", "org.sipdroid.sipua.rosenweg.SperrHome")
+                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+            } catch (_: Exception) {
+            }
+        }
         wasJustPaused = false
         refreshWallpaperSupportsDarkText()
         Handler(Looper.getMainLooper()).postDelayed({
@@ -285,6 +299,13 @@ class MainActivity : SimpleActivity(), FlingListener {
             }
 
             binding.allAppsFragment.root.gotLaunchers(IconCache.launchers)
+            // Rosenweg: nach der Anmeldung die Startseite der Person (Anlage)
+            RosenwegStartseite.ladenWennNoetig(this)
+            if (RosenwegStartseite.neuAufbauenNoetig(this)) {
+                // Ansicht ganz neu: alte Widget-Ansichten sonst noch auf dem Bildschirm
+                runOnUiThread { recreate() }
+                return@ensureBackgroundThread
+            }
             refreshLaunchers()
         }
 
@@ -317,6 +338,8 @@ class MainActivity : SimpleActivity(), FlingListener {
     override fun onPause() {
         super.onPause()
         wasJustPaused = true
+        // Rosenweg: geaenderte Startseite der Person speichern
+        ensureBackgroundThread { RosenwegStartseite.senden(applicationContext) }
     }
 
     override fun onBackPressedCompat(): Boolean {
@@ -554,7 +577,8 @@ class MainActivity : SimpleActivity(), FlingListener {
     }
 
     private fun findFirstEmptyCell(): Pair<Int, Rect> {
-        val gridItems = homeScreenGridItemsDB.getAllItems() as ArrayList<HomeScreenGridItem>
+        // Rosenweg: System-Telefon-Apps nicht auf dem Startbildschirm
+        val gridItems = ArrayList(homeScreenGridItemsDB.getAllItems().filter { it.packageName !in rosenwegVersteckt() })
         val maxPage = gridItems.maxOf { it.page }
         val occupiedCells = ArrayList<Triple<Int, Int, Int>>()
         gridItems.toImmutableList().filter { it.parentId == null }.forEach { item ->
@@ -1084,6 +1108,7 @@ class MainActivity : SimpleActivity(), FlingListener {
             it.getIconIdentifier()
         }
 
+        val versteckteTelefonApps = rosenwegVersteckt()
         val allApps = ArrayList<AppLauncher>()
         val intent = Intent(Intent.ACTION_MAIN, null)
         intent.addCategory(Intent.CATEGORY_LAUNCHER)
@@ -1099,7 +1124,7 @@ class MainActivity : SimpleActivity(), FlingListener {
             }
 
             val activityName = info.activityInfo.name
-            if (hiddenIcons.contains("$packageName/$activityName")) {
+            if (hiddenIcons.contains("$packageName/$activityName") || packageName in versteckteTelefonApps) {
                 continue
             }
 
@@ -1219,9 +1244,9 @@ class MainActivity : SimpleActivity(), FlingListener {
         }
 
         try {
-            val potentialStores = arrayListOf(
-                "com.android.vending", "org.fdroid.fdroid", "com.aurora.store"
-            )
+            // Rosenweg: kein Store-Symbol auf dem Startbildschirm (Apps kommen
+            // auf geteilten Telefonen aus dem Katalog der Anlage).
+            val potentialStores = arrayListOf<String>()
             val storePackage = potentialStores.firstOrNull {
                 isPackageInstalled(it) && appLaunchers.map { it.packageName }.contains(it)
             }

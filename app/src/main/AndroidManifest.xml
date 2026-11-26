@@ -22,6 +22,12 @@
         android:name="android.hardware.telephony"
         android:required="false" />
 
+    <!-- Rosenweg: Startseite pro Person ueber die Geraete-App (AnlageProvider) -->
+    <uses-permission android:name="ch.rosenweg4303.permission.ANLAGE" />
+    <queries>
+        <provider android:authorities="ch.rosenweg4303.telefon.anlage" />
+    </queries>
+
     <application
         android:name="org.fossify.commons.FossifyApp"
         android:allowBackup="true"
@@ -95,9 +101,9 @@
             android:enabled="false"
             android:excludeFromRecents="true"
             android:exported="true"
-            android:icon="@mipmap/ic_launcher_red"
+            android:icon="@mipmap/ic_launcher"
             android:launchMode="singleTask"
-            android:roundIcon="@mipmap/ic_launcher_red"
+            android:roundIcon="@mipmap/ic_launcher"
             android:targetActivity=".activities.SplashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -113,9 +119,9 @@
             android:enabled="false"
             android:excludeFromRecents="true"
             android:exported="true"
-            android:icon="@mipmap/ic_launcher_pink"
+            android:icon="@mipmap/ic_launcher"
             android:launchMode="singleTask"
-            android:roundIcon="@mipmap/ic_launcher_pink"
+            android:roundIcon="@mipmap/ic_launcher"
             android:targetActivity=".activities.SplashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -131,9 +137,9 @@
             android:enabled="false"
             android:excludeFromRecents="true"
             android:exported="true"
-            android:icon="@mipmap/ic_launcher_purple"
+            android:icon="@mipmap/ic_launcher"
             android:launchMode="singleTask"
-            android:roundIcon="@mipmap/ic_launcher_purple"
+            android:roundIcon="@mipmap/ic_launcher"
             android:targetActivity=".activities.SplashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -149,9 +155,9 @@
             android:enabled="false"
             android:excludeFromRecents="true"
             android:exported="true"
-            android:icon="@mipmap/ic_launcher_deep_purple"
+            android:icon="@mipmap/ic_launcher"
             android:launchMode="singleTask"
-            android:roundIcon="@mipmap/ic_launcher_deep_purple"
+            android:roundIcon="@mipmap/ic_launcher"
             android:targetActivity=".activities.SplashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -167,9 +173,9 @@
             android:enabled="false"
             android:excludeFromRecents="true"
             android:exported="true"
-            android:icon="@mipmap/ic_launcher_indigo"
+            android:icon="@mipmap/ic_launcher"
             android:launchMode="singleTask"
-            android:roundIcon="@mipmap/ic_launcher_indigo"
+            android:roundIcon="@mipmap/ic_launcher"
             android:targetActivity=".activities.SplashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -185,9 +191,9 @@
             android:enabled="false"
             android:excludeFromRecents="true"
             android:exported="true"
-            android:icon="@mipmap/ic_launcher_blue"
+            android:icon="@mipmap/ic_launcher"
             android:launchMode="singleTask"
-            android:roundIcon="@mipmap/ic_launcher_blue"
+            android:roundIcon="@mipmap/ic_launcher"
             android:targetActivity=".activities.SplashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -203,9 +209,9 @@
             android:enabled="false"
             android:excludeFromRecents="true"
             android:exported="true"
-            android:icon="@mipmap/ic_launcher_light_blue"
+            android:icon="@mipmap/ic_launcher"
             android:launchMode="singleTask"
-            android:roundIcon="@mipmap/ic_launcher_light_blue"
+            android:roundIcon="@mipmap/ic_launcher"
             android:targetActivity=".activities.SplashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -221,9 +227,9 @@
             android:enabled="false"
             android:excludeFromRecents="true"
             android:exported="true"
-            android:icon="@mipmap/ic_launcher_cyan"
+            android:icon="@mipmap/ic_launcher"
             android:launchMode="singleTask"
-            android:roundIcon="@mipmap/ic_launcher_cyan"
+            android:roundIcon="@mipmap/ic_launcher"
             android:targetActivity=".activities.SplashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -239,9 +245,9 @@
             android:enabled="false"
             android:excludeFromRecents="true"
             android:exported="true"
-            android:icon="@mipmap/ic_launcher_teal"
+            android:icon="@mipmap/ic_launcher"
             android:launchMode="singleTask"
-            android:roundIcon="@mipmap/ic_launcher_teal"
+            android:roundIcon="@mipmap/ic_launcher"
             android:targetActivity=".activities.SplashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -275,9 +281,9 @@
             android:enabled="false"
             android:excludeFromRecents="true"
             android:exported="true"
-            android:icon="@mipmap/ic_launcher_light_green"
+            android:icon="@mipmap/ic_launcher"
             android:launchMode="singleTask"
-            android:roundIcon="@mipmap/ic_launcher_light_green"
+            android:roundIcon="@mipmap/ic_launcher"
             android:targetActivity=".activities.SplashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -293,9 +299,9 @@
             android:enabled="false"
             android:excludeFromRecents="true"
             android:exported="true"
-            android:icon="@mipmap/ic_launcher_lime"
+            android:icon="@mipmap/ic_launcher"
             android:launchMode="singleTask"
-            android:roundIcon="@mipmap/ic_launcher_lime"
+            android:roundIcon="@mipmap/ic_launcher"
             android:targetActivity=".activities.SplashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -311,9 +317,9 @@
             android:enabled="false"
             android:excludeFromRecents="true"
             android:exported="true"
-            android:icon="@mipmap/ic_launcher_yellow"
+            android:icon="@mipmap/ic_launcher"
             android:launchMode="singleTask"
-            android:roundIcon="@mipmap/ic_launcher_yellow"
+            android:roundIcon="@mipmap/ic_launcher"
             android:targetActivity=".activities.SplashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -329,9 +335,9 @@
             android:enabled="false"
             android:excludeFromRecents="true"
             android:exported="true"
-            android:icon="@mipmap/ic_launcher_amber"
+            android:icon="@mipmap/ic_launcher"
             android:launchMode="singleTask"
-            android:roundIcon="@mipmap/ic_launcher_amber"
+            android:roundIcon="@mipmap/ic_launcher"
             android:targetActivity=".activities.SplashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -347,9 +353,9 @@
             android:enabled="false"
             android:excludeFromRecents="true"
             android:exported="true"
-            android:icon="@mipmap/ic_launcher_orange"
+            android:icon="@mipmap/ic_launcher"
             android:launchMode="singleTask"
-            android:roundIcon="@mipmap/ic_launcher_orange"
+            android:roundIcon="@mipmap/ic_launcher"
             android:targetActivity=".activities.SplashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -365,9 +371,9 @@
             android:enabled="false"
             android:excludeFromRecents="true"
             android:exported="true"
-            android:icon="@mipmap/ic_launcher_deep_orange"
+            android:icon="@mipmap/ic_launcher"
             android:launchMode="singleTask"
-            android:roundIcon="@mipmap/ic_launcher_deep_orange"
+            android:roundIcon="@mipmap/ic_launcher"
             android:targetActivity=".activities.SplashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -383,9 +389,9 @@
             android:enabled="false"
             android:excludeFromRecents="true"
             android:exported="true"
-            android:icon="@mipmap/ic_launcher_brown"
+            android:icon="@mipmap/ic_launcher"
             android:launchMode="singleTask"
-            android:roundIcon="@mipmap/ic_launcher_brown"
+            android:roundIcon="@mipmap/ic_launcher"
             android:targetActivity=".activities.SplashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -401,9 +407,9 @@
             android:enabled="false"
             android:excludeFromRecents="true"
             android:exported="true"
-            android:icon="@mipmap/ic_launcher_blue_grey"
+            android:icon="@mipmap/ic_launcher"
             android:launchMode="singleTask"
-            android:roundIcon="@mipmap/ic_launcher_blue_grey"
+            android:roundIcon="@mipmap/ic_launcher"
             android:targetActivity=".activities.SplashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -419,9 +425,9 @@
             android:enabled="false"
             android:excludeFromRecents="true"
             android:exported="true"
-            android:icon="@mipmap/ic_launcher_grey_black"
+            android:icon="@mipmap/ic_launcher"
             android:launchMode="singleTask"
-            android:roundIcon="@mipmap/ic_launcher_grey_black"
+            android:roundIcon="@mipmap/ic_launcher"
             android:targetActivity=".activities.SplashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -440,6 +446,15 @@
                 android:resource="@xml/device_admin_policies" />
             <intent-filter>
                 <action android:name="android.app.action.DEVICE_ADMIN_ENABLED" />
+            </intent-filter>
+        </receiver>
+        <!-- Rosenweg: Anmelden/Abmelden von der Geraete-App (nur Rosenweg-Signatur) -->
+        <receiver
+            android:name=".helpers.RosenwegStartseite$Empfaenger"
+            android:exported="true"
+            android:permission="ch.rosenweg4303.permission.ANLAGE">
+            <intent-filter>
+                <action android:name="ch.rosenweg4303.home.STARTSEITE" />
             </intent-filter>
         </receiver>
     </application>
