@@ -3,11 +3,13 @@
   <ManuallySuppressedIssues/>
   <CurrentIssues>
     <ID>ComplexCondition:HomeScreenGrid.kt$AnimatedGridPager$currentPage &lt; getMaxPage() &amp;&amp; diffX &gt; 0f || currentPage &gt; 0 &amp;&amp; diffX &lt; 0f</ID>
+    <ID>ComplexCondition:HomeScreenGrid.kt$HomeScreenGrid$context.isPackageInstalled(kamera) &amp;&amp; alle.none { it.packageName == kamera &amp;&amp; it.parentId == null } &amp;&amp; alle.none { it.docked &amp;&amp; it.left == spalten - 1 &amp;&amp; it.parentId == null }</ID>
     <ID>ComplexCondition:HomeScreenGrid.kt$HomeScreenGrid$item.page != 0 &amp;&amp; gridItems .none { it.page == item.page &amp;&amp; it.id != item.id &amp;&amp; it.parentId == null }</ID>
     <ID>ComplexCondition:HomeScreenGrid.kt$HomeScreenGrid$newParentId != null &amp;&amp; gridItems.any { it.parentId == newParentId &amp;&amp; it.left == left } &amp;&amp; (newParentId != oldParentId || left != oldLeft)</ID>
     <ID>ComplexCondition:HomeScreenGrid.kt$HomeScreenGrid$x &gt;= left &amp;&amp; x &lt;= right &amp;&amp; y &gt;= top &amp;&amp; y &lt;= bottom</ID>
     <ID>ComplexCondition:HomeScreenGrid.kt$HomeScreenGrid$x &gt;= rect.left &amp;&amp; x &lt;= rect.right &amp;&amp; y &gt;= rect.top &amp;&amp; y &lt;= rect.bottom</ID>
     <ID>CyclomaticComplexMethod:Activity.kt$fun Activity.handleGridItemPopupMenu( anchorView: View, gridItem: HomeScreenGridItem, isOnAllAppsFragment: Boolean, listener: ItemMenuListener, ): PopupMenu</ID>
+    <ID>CyclomaticComplexMethod:AnlageEinstellungen.kt$AnlageEinstellungen$private fun senden(ctx: Context, prefs: SharedPreferences)</ID>
     <ID>CyclomaticComplexMethod:HomeScreenGrid.kt$HomeScreenGrid$fun draggedItemMoved(x: Int, y: Int)</ID>
     <ID>CyclomaticComplexMethod:HomeScreenGrid.kt$HomeScreenGrid$fun drawInto(canvas: Canvas)</ID>
     <ID>CyclomaticComplexMethod:HomeScreenGrid.kt$HomeScreenGrid$fun isClickingGridItem(x: Int, y: Int): HomeScreenGridItem?</ID>
@@ -15,8 +17,10 @@
     <ID>CyclomaticComplexMethod:HomeScreenGrid.kt$HomeScreenGrid$private fun addAppIconOrShortcut()</ID>
     <ID>CyclomaticComplexMethod:HomeScreenGrid.kt$HomeScreenGrid$private fun addWidget()</ID>
     <ID>CyclomaticComplexMethod:HomeScreenGrid.kt$HomeScreenGrid$private fun moveItem()</ID>
+    <ID>CyclomaticComplexMethod:HomeScreenGrid.kt$HomeScreenGrid$private fun rosenwegStandard(providers: List&lt;AppWidgetProviderInfo&gt;): HomeScreenGridItem?</ID>
     <ID>CyclomaticComplexMethod:MainActivity.kt$MainActivity$override fun onTouchEvent(event: MotionEvent?): Boolean</ID>
     <ID>CyclomaticComplexMethod:MyAppWidgetResizeFrame.kt$MyAppWidgetResizeFrame$override fun onTouchEvent(event: MotionEvent?): Boolean</ID>
+    <ID>EmptyCatchBlock:Activity.kt${ }</ID>
     <ID>EmptyCatchBlock:Context.kt${ }</ID>
     <ID>EmptyCatchBlock:WidgetsFragment.kt$WidgetsFragment${ }</ID>
     <ID>EmptyFunctionBlock:HiddenIconsAdapter.kt$HiddenIconsAdapter${}</ID>
@@ -26,7 +30,9 @@
     <ID>LongMethod:HomeScreenGrid.kt$HomeScreenGrid$private fun addAppIconOrShortcut( draggedHomeGridItem: HomeScreenGridItem?, xIndex: Int, yIndex: Int, newParentId: Long? = null, toFolderEnd: Boolean = true, )</ID>
     <ID>LongMethod:MainActivity.kt$MainActivity$private fun getDefaultAppPackages(appLaunchers: ArrayList&lt;AppLauncher&gt;)</ID>
     <ID>LongMethod:MyAppWidgetResizeFrame.kt$MyAppWidgetResizeFrame$override fun onTouchEvent(event: MotionEvent?): Boolean</ID>
+    <ID>LoopWithTooManyJumpStatements:AnlageEinstellungen.kt$AnlageEinstellungen$for</ID>
     <ID>LoopWithTooManyJumpStatements:MainActivity.kt$MainActivity$for</ID>
+    <ID>LoopWithTooManyJumpStatements:RosenwegStartseite.kt$RosenwegStartseite$for</ID>
     <ID>MagicNumber:Context.kt$30</ID>
     <ID>MagicNumber:Context.kt$70.0</ID>
     <ID>MagicNumber:Converters.kt$Converters$100</ID>
@@ -39,6 +45,7 @@
     <ID>MagicNumber:HomeScreenGrid.kt$HomeScreenGrid$1.2f</ID>
     <ID>MagicNumber:HomeScreenGrid.kt$HomeScreenGrid$1.5f</ID>
     <ID>MagicNumber:HomeScreenGrid.kt$HomeScreenGrid$3f</ID>
+    <ID>MagicNumber:HomeScreenGrid.kt$HomeScreenGrid$4</ID>
     <ID>MagicNumber:HomeScreenGrid.kt$HomeScreenGrid$5</ID>
     <ID>MagicNumber:HomeScreenGrid.kt$HomeScreenGrid.HomeScreenFolder$0.2f</ID>
     <ID>MagicNumber:HomeScreenGrid.kt$HomeScreenGrid.HomeScreenFolder$3</ID>
@@ -50,7 +57,6 @@
     <ID>MagicNumber:MainActivity.kt$MainActivity$0.5</ID>
     <ID>MagicNumber:MainActivity.kt$MainActivity$2000</ID>
     <ID>MagicNumber:MainActivity.kt$MainActivity.MyGestureListener$500L</ID>
-    <ID>MagicNumber:MyAppWidgetHostView.kt$MyAppWidgetHostView$4</ID>
     <ID>MagicNumber:MyAppWidgetResizeFrame.kt$MyAppWidgetResizeFrame$3</ID>
     <ID>MagicNumber:MyAppWidgetResizeFrame.kt$MyAppWidgetResizeFrame$4</ID>
     <ID>MagicNumber:MyAppWidgetResizeFrame.kt$MyAppWidgetResizeFrame$5</ID>
@@ -64,6 +70,8 @@
     <ID>MaxLineLength:HomeScreenGrid.kt$HomeScreenGrid$abs(it.second - draggedItemCurrentCoords.first + sideMargins.left) + abs(it.third - draggedItemCurrentCoords.second + sideMargins.top)</ID>
     <ID>MaxLineLength:HomeScreenGrid.kt$HomeScreenGrid$abs(it.x - draggedItemCurrentCoords.first + sideMargins.left) + abs(it.y - draggedItemCurrentCoords.second + sideMargins.top)</ID>
     <ID>MaxLineLength:HomeScreenGrid.kt$HomeScreenGrid$draggedItem!!.getWidthInCells() * cellWidth - iconMargin * (draggedItem!!.getWidthInCells() - 1)</ID>
+    <ID>MaxLineLength:HomeScreenGrid.kt$HomeScreenGrid$it.provider.packageName == "ch.rosenweg4303.clock" &amp;&amp; it.provider.className.endsWith("MyDigitalTimeWidgetProvider")</ID>
+    <ID>MaxLineLength:HomeScreenGrid.kt$HomeScreenGrid$val info = providers.firstOrNull { it.provider.className == e.optString("cls") } ?: return@mapNotNull null</ID>
     <ID>MaxLineLength:HomeScreenGridItem.kt$HomeScreenGridItem$@ColumnInfo(name = "activity_name") var activityName: String</ID>
     <ID>MaxLineLength:HomeScreenGridItem.kt$HomeScreenGridItem$@ColumnInfo(name = "docked") var docked: Boolean = false</ID>
     <ID>MaxLineLength:HomeScreenGridItem.kt$HomeScreenGridItem$@ColumnInfo(name = "icon") var icon: Bitmap? = null</ID>
@@ -90,6 +98,7 @@
     <ID>MaxLineLength:MyAppWidgetResizeFrame.kt$MyAppWidgetResizeFrame$val wantedRight = roundToClosestMultiplyOfNumber(frameRect.right - sideMargins.left, cellWidth)</ID>
     <ID>MaxLineLength:MyAppWidgetResizeFrame.kt$MyAppWidgetResizeFrame$val wantedRightCellX = roundToClosestMultiplyOfNumber(wantedRight - sideMargins.left, cellWidth) / cellWidth - 1</ID>
     <ID>MaxLineLength:MyAppWidgetResizeFrame.kt$MyAppWidgetResizeFrame$val wantedTopCellY = roundToClosestMultiplyOfNumber(wantedTop - sideMargins.top, cellHeight) / cellHeight</ID>
+    <ID>MaxLineLength:RosenwegStartseite.kt$RosenwegStartseite$prefs(c).edit().remove(GELADEN).remove(SIGNATUR).remove(AUSSTEHEND).remove(GESPEICHERT).putBoolean("standard_v1", false)</ID>
     <ID>MaxLineLength:WidgetsFragment.kt$WidgetsFragment$// some devices ACTION_MOVE keeps triggering for the whole long press duration, but we are interested in real moves only, when coords change</ID>
     <ID>MaxLineLength:WidgetsFragment.kt$WidgetsFragment$if</ID>
     <ID>NestedBlockDepth:AllAppsFragment.kt$AllAppsFragment$override fun onInterceptTouchEvent(event: MotionEvent?): Boolean</ID>
@@ -106,14 +115,20 @@
     <ID>NewLineAtEndOfFile:IconCache.kt$org.fossify.home.helpers.IconCache.kt</ID>
     <ID>NewLineAtEndOfFile:View.kt$org.fossify.home.extensions.View.kt</ID>
     <ID>ReturnCount:HomeScreenGrid.kt$HomeScreenGrid$fun isClickingGridItem(x: Int, y: Int): HomeScreenGridItem?</ID>
+    <ID>ReturnCount:HomeScreenGrid.kt$HomeScreenGrid$private fun rosenwegStandard(providers: List&lt;AppWidgetProviderInfo&gt;): HomeScreenGridItem?</ID>
     <ID>SwallowedException:Activity.kt$e: Exception</ID>
+    <ID>SwallowedException:AnlageEinstellungen.kt$AnlageEinstellungen$e: Exception</ID>
     <ID>SwallowedException:Context.kt$e: Error</ID>
     <ID>SwallowedException:Context.kt$e: Exception</ID>
+    <ID>SwallowedException:RosenwegStartseite.kt$RosenwegStartseite$e: Exception</ID>
     <ID>SwallowedException:WidgetsFragment.kt$WidgetsFragment$error: Error</ID>
     <ID>TooGenericExceptionCaught:Activity.kt$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:AnlageEinstellungen.kt$AnlageEinstellungen$e: Exception</ID>
     <ID>TooGenericExceptionCaught:Context.kt$e: Error</ID>
     <ID>TooGenericExceptionCaught:Context.kt$e: Exception</ID>
     <ID>TooGenericExceptionCaught:MainActivity.kt$MainActivity$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:RosenwegStartseite.kt$RosenwegStartseite$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:RosenwegStartseite.kt$RosenwegStartseite.Empfaenger$e: Exception</ID>
     <ID>TooGenericExceptionCaught:WidgetsFragment.kt$WidgetsFragment$error: Error</ID>
     <ID>TooManyFunctions:AllAppsFragment.kt$AllAppsFragment : MyFragmentAllAppsListener</ID>
     <ID>TooManyFunctions:HiddenIconsAdapter.kt$HiddenIconsAdapter : MyRecyclerViewAdapter</ID>
@@ -121,6 +136,7 @@
     <ID>TooManyFunctions:HomeScreenGrid.kt$HomeScreenGrid : RelativeLayout</ID>
     <ID>TooManyFunctions:HomeScreenGridItemsDao.kt$HomeScreenGridItemsDao</ID>
     <ID>TooManyFunctions:MainActivity.kt$MainActivity : SimpleActivityFlingListener</ID>
+    <ID>TooManyFunctions:RosenwegStartseite.kt$RosenwegStartseite</ID>
     <ID>TooManyFunctions:SettingsActivity.kt$SettingsActivity : SimpleActivity</ID>
     <ID>UnusedParameter:HomeScreenGrid.kt$AnimatedGridPager$y: Int</ID>
     <ID>UnusedParameter:WidgetsAdapter.kt$WidgetsAdapter.ViewHolder$widgetListItem: WidgetsListItem</ID>
