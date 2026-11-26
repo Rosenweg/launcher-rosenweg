@@ -5,10 +5,10 @@
 Die App baut gegen den Rosenweg-Fork der Fossify Commons und die Rosenweg-Module `cloud`/`updater` (`ch.rosenweg4303:*`). Diese kommen aus dem lokalen Maven-Repository (`mavenLocal()`), also zuerst [commons-rosenweg](https://github.com/Rosenweg/commons-rosenweg) veröffentlichen:
 
 ```bash
-# in commons-rosenweg, Zweig rosenweg
+# in commons-rosenweg, Zweig main
 ./gradlew -PVERSION=7.1.3-rosenweg.1 publishToMavenLocal
 
-# in diesem Repo, Zweig rosenweg
+# in diesem Repo, Zweig main
 ./gradlew assembleFossRelease
 ```
 
@@ -22,4 +22,4 @@ APK wie oben bauen und signieren, dann `gh release create v<versionName> <datei.
 
 ## Zweige
 
-Der Zweig `main` folgt dem Original, die Rosenweg-Anpassungen liegen im Zweig `rosenweg`.
+`main` ist der Hauptzweig mit allen Rosenweg-Anpassungen; der frühere Arbeitszweig `rosenweg` ist darin gemergt.
