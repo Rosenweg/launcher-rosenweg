@@ -4,14 +4,19 @@ import android.annotation.SuppressLint
 import android.app.admin.DevicePolicyManager
 import android.content.ComponentName
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import org.fossify.commons.dialogs.ConfirmationDialog
 import org.fossify.commons.dialogs.RadioGroupDialog
+import org.fossify.commons.extensions.beGone
 import org.fossify.commons.extensions.beVisibleIf
+import org.fossify.commons.extensions.toast
 import org.fossify.commons.extensions.getProperPrimaryColor
 import org.fossify.commons.extensions.launchMoreAppsFromUsIntent
 import org.fossify.commons.extensions.updateTextColors
 import org.fossify.commons.extensions.viewBinding
 import org.fossify.commons.helpers.NavigationIcon
+import org.fossify.commons.helpers.ensureBackgroundThread
 import org.fossify.commons.helpers.isTiramisuPlus
 import org.fossify.commons.models.FAQItem
 import org.fossify.commons.models.RadioItem
@@ -19,6 +24,8 @@ import org.fossify.home.BuildConfig
 import org.fossify.home.R
 import org.fossify.home.databinding.ActivitySettingsBinding
 import org.fossify.home.extensions.config
+import org.fossify.home.extensions.istVerwaltetesRosenwegTelefon
+import org.fossify.home.extensions.rosenwegAngemeldet
 import org.fossify.home.helpers.MAX_COLUMN_COUNT
 import org.fossify.home.helpers.MAX_ROW_COUNT
 import org.fossify.home.helpers.MIN_COLUMN_COUNT
@@ -60,6 +67,7 @@ class SettingsActivity : SimpleActivity() {
         setupShowHomeAppLabels()
         setupLanguage()
         setupManageHiddenIcons()
+        setupRosenwegHintergrund()
         updateTextColors(binding.settingsHolder)
 
         arrayOf(
@@ -272,6 +280,41 @@ class SettingsActivity : SimpleActivity() {
     private fun setupManageHiddenIcons() {
         binding.settingsManageHiddenIconsHolder.setOnClickListener {
             startActivity(Intent(this, HiddenIconsActivity::class.java))
+        }
+    }
+
+    /**
+     * Rosenweg: "Hintergrund zuruecksetzen" - nur auf geteilten Telefonen mit angemeldeter Person.
+     * Rosenweg Geraet loescht den Hintergrund der Person auf der Anlage und setzt sofort den
+     * Rosenweg-Standard (AnlageProvider "hintergrund_zuruecksetzen"). Einen neuen setzt man wie
+     * gewohnt (Galerie "Als Hintergrund"), Geraet nimmt ihn von selbst mit.
+     */
+    private fun setupRosenwegHintergrund() {
+        binding.settingsRosenwegHintergrundHolder.beGone()
+        ensureBackgroundThread {
+            val zeigen = istVerwaltetesRosenwegTelefon() && rosenwegAngemeldet()
+            runOnUiThread { binding.settingsRosenwegHintergrundHolder.beVisibleIf(zeigen) }
+        }
+        binding.settingsRosenwegHintergrundHolder.setOnClickListener {
+            ConfirmationDialog(
+                activity = this,
+                message = getString(R.string.rosenweg_hintergrund_frage),
+                messageId = 0,
+                positive = org.fossify.commons.R.string.yes,
+                negative = org.fossify.commons.R.string.no
+            ) {
+                ensureBackgroundThread {
+                    val fehler = try {
+                        contentResolver.call(Uri.parse("content://ch.rosenweg4303.telefon.anlage"),
+                            "hintergrund_zuruecksetzen", "1", null)
+                            ?.let { if (it.getBoolean("ok")) null else it.getString("fehler") ?: "Fehler" }
+                            ?: "Rosenweg Gerät antwortet nicht"
+                    } catch (e: Exception) {
+                        "Rosenweg Gerät nicht erreichbar"
+                    }
+                    runOnUiThread { toast(fehler ?: getString(R.string.rosenweg_hintergrund_ok)) }
+                }
+            }
         }
     }
 

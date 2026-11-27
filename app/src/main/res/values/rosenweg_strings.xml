@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Rosenweg: nur auf geteilten Telefonen (Rosenweg Geraet), nur Deutsch -->
+    <string name="rosenweg_hintergrund_zuruecksetzen" translatable="false">Hintergrund zurücksetzen</string>
+    <string name="rosenweg_hintergrund_frage" translatable="false">Deinen Hintergrund auf den Rosenweg-Standard zurücksetzen? Das gilt auf allen geteilten Telefonen.</string>
+    <string name="rosenweg_hintergrund_ok" translatable="false">Hintergrund zurückgesetzt</string>
+</resources>
