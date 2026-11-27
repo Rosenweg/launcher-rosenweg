@@ -45,6 +45,7 @@ class SettingsActivity : SimpleActivity() {
         refreshMenuItems()
 
         setupCustomizeColors()
+        binding.settingsRwUpdatesHolder.setOnClickListener { ch.rosenweg4303.updater.RosenwegUpdater.jetztPruefen(this) }
         setupUseEnglish()
         setupDoubleTapToLock()
         setupCloseAppDrawerOnOtherAppOpen()
