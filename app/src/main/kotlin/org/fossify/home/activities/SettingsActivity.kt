@@ -309,8 +309,10 @@ class SettingsActivity : SimpleActivity() {
                             "hintergrund_zuruecksetzen", "1", null)
                             ?.let { if (it.getBoolean("ok")) null else it.getString("fehler") ?: "Fehler" }
                             ?: "Rosenweg Gerät antwortet nicht"
-                    } catch (e: Exception) {
-                        "Rosenweg Gerät nicht erreichbar"
+                    } catch (e: SecurityException) {
+                        "Rosenweg Gerät nicht erreichbar (${e.javaClass.simpleName})"
+                    } catch (e: IllegalArgumentException) {
+                        "Rosenweg Gerät nicht erreichbar (${e.javaClass.simpleName})"
                     }
                     runOnUiThread { toast(fehler ?: getString(R.string.rosenweg_hintergrund_ok)) }
                 }
