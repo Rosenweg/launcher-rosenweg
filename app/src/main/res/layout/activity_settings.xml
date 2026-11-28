@@ -345,6 +345,24 @@
                     android:text="@string/show_app_labels" />
 
             </RelativeLayout>
+
+            <!-- Rosenweg: Hintergrund der Person auf den Standard (ueber Rosenweg Geraet) -->
+            <RelativeLayout
+                android:id="@+id/settings_rosenweg_hintergrund_holder"
+                style="@style/SettingsHolderTextViewOneLinerStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/ripple_background"
+                android:visibility="gone">
+
+                <org.fossify.commons.views.MyTextView
+                    android:id="@+id/settings_rosenweg_hintergrund"
+                    style="@style/SettingsTextLabelStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/rosenweg_hintergrund_zuruecksetzen" />
+
+            </RelativeLayout>
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
