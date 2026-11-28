@@ -305,10 +305,14 @@ class SettingsActivity : SimpleActivity() {
             ) {
                 ensureBackgroundThread {
                     val fehler = try {
-                        contentResolver.call(Uri.parse("content://ch.rosenweg4303.telefon.anlage"),
+                        val antwort = contentResolver.call(Uri.parse("content://ch.rosenweg4303.telefon.anlage"),
                             "hintergrund_zuruecksetzen", "1", null)
-                            ?.let { if (it.getBoolean("ok")) null else it.getString("fehler") ?: "Fehler" }
-                            ?: "Rosenweg Gerät antwortet nicht"
+                        // ok -> null (kein Fehler); nicht mit ?: verketten, sonst wird ok zu "antwortet nicht"
+                        when {
+                            antwort == null -> "Rosenweg Gerät antwortet nicht"
+                            antwort.getBoolean("ok") -> null
+                            else -> antwort.getString("fehler") ?: "Fehler"
+                        }
                     } catch (e: SecurityException) {
                         "Rosenweg Gerät nicht erreichbar (${e.javaClass.simpleName})"
                     } catch (e: IllegalArgumentException) {
